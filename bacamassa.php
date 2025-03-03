@@ -1,60 +1,58 @@
 <?php
+// Load file koneksi.php
 include "koneksi.php";
-require('./fpdf/fpdf.php');
 
-date_default_timezone_set('Asia/Jakarta');
-
-class PDF extends FPDF
-{
-    function Header()
-    {
-        $this->SetFont('Arial', 'B', 18);
-        $this->Cell(0, 10, 'Data Timbangan Massa', 0, 1, 'C');
-        $this->Ln(10);gi
-        
-        $currentTime = date('Y-m-d H:i:s');
-        $this->SetFont('Courier', 'I', 10);
-        $this->Cell(0, 10, 'Dibuat pada: ' . $currentTime, 0, 1, 'R');
-    }
-
-    function Footer()
-    {
-        $this->SetY(-15);
-        $this->SetFont('Arial', 'I', 8);
-        $this->Cell(0, 10, 'Halaman ' . $this->PageNo() . '/{nb}', 0, 0, 'C');
-    }
-}
-
-$pdf = new PDF();
-$pdf->AliasNbPages();
-$pdf->AddPage('L', 'A4');
-
-$pdf->SetXY(10, 40);
-$pdf->SetFont('Courier', 'B', 12);
-
-$pdf->Cell(50, 10, 'Nama', 1, 0, 'C');
-$pdf->Cell(50, 10, 'Alamat', 1, 0, 'C');
-$pdf->Cell(40, 10, 'Telepon', 1, 0, 'C');
-$pdf->Cell(40, 10, 'Timbangan', 1, 0, 'C');
-$pdf->Cell(40, 10, 'Merk', 1, 0, 'C');
-$pdf->Cell(40, 10, 'Model', 1, 0, 'C');
-$pdf->Cell(40, 10, 'Seri', 1, 0, 'C');
-$pdf->Cell(40, 10, 'Kapasitas', 1, 1, 'C');
-
-$sql = $pdo->prepare("SELECT * FROM massa ORDER BY nama");
+// Ambil data dari database
+$sql = $pdo->prepare("SELECT * FROM massa");
 $sql->execute();
+$data = $sql->fetchAll(PDO::FETCH_ASSOC);
+?>
 
-$pdf->SetFont('Courier', '', 12);
-while ($data = $sql->fetch()) {
-    $pdf->Cell(50, 10, $data['nama'], 1, 0, 'C');
-    $pdf->Cell(50, 10, $data['alamat'], 1, 0, 'C');
-    $pdf->Cell(40, 10, $data['telp'], 1, 0, 'C');
-    $pdf->Cell(40, 10, $data['timbangan'], 1, 0, 'C');
-    $pdf->Cell(40, 10, $data['merk'], 1, 0, 'C');
-    $pdf->Cell(40, 10, $data['model'], 1, 0, 'C');
-    $pdf->Cell(40, 10, $data['seri'], 1, 0, 'C');
-    $pdf->Cell(40, 10, $data['kapasitas'], 1, 1, 'C');
-}
-
-$filename = 'Data_Timbangan_Massa.pdf';
-$pdf->Output($filename, 'D');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Timbangan Massa</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="text-center">Data Timbangan Massa</h2>
+        <table class="table table-bordered table-striped mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>Alamat</th>
+                    <th>Telepon</th>
+                    <th>Timbangan</th>
+                    <th>Merk</th>
+                    <th>Model</th>
+                    <th>Seri</th>
+                    <th>Kapasitas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php $no = 1; foreach ($data as $row): ?>
+                <tr>
+                    <td><?= $no++; ?></td>
+                    <td><?= htmlspecialchars($row['nama']); ?></td>
+                    <td><?= htmlspecialchars($row['alamat']); ?></td>
+                    <td><?= htmlspecialchars($row['telp']); ?></td>
+                    <td><?= htmlspecialchars($row['timbangan']); ?></td>
+                    <td><?= htmlspecialchars($row['merk']); ?></td>
+                    <td><?= htmlspecialchars($row['model']); ?></td>
+                    <td><?= htmlspecialchars($row['seri']); ?></td>
+                    <td><?= htmlspecialchars($row['kapasitas']); ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
